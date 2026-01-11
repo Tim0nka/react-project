@@ -5,44 +5,50 @@ export default function CreatePost() {
   const { addPost, setPage } = useAppContext();
   const [content, setContent] = useState('');
   const [image, setImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   
   const handleSubmit = (e) => {
     e.preventDefault();
-    addPost(content, image);
+    if (content.trim()) {
+      addPost(content, image);
+      setContent('');
+      setImage(null);
+      setPreviewUrl(null);
+      setPage('feed');
+    }
   };
   
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImage(file);
+      setPreviewUrl(URL.createObjectURL(file));
     }
   };
   
   return (
     <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-        <button 
-          onClick={() => setPage('feed')}
-          style={{ background: 'none', border: 'none', color: '#0095f6', fontSize: '18px' }}
-        >
-          ←
-        </button>
-        <h2 style={{ color: '#0095f6', marginLeft: '12px' }}>Новый пост</h2>
-      </div>
-      
       <form onSubmit={handleSubmit}>
         <div style={{ 
           width: '100%', 
-          height: '200px', 
+          height: '300px', 
           backgroundColor: '#333', 
           borderRadius: '8px', 
           marginBottom: '20px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#888'
+          overflow: 'hidden'
         }}>
-          {image ? 'Изображение выбрано' : 'Выберите фото'}
+          {previewUrl ? (
+            <img 
+              src={previewUrl} 
+              alt="preview" 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            />
+          ) : (
+            <div style={{ color: '#888' }}>Выберите фото</div>
+          )}
         </div>
         
         <input

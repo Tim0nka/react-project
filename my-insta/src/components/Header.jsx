@@ -8,14 +8,26 @@ export default function Header() {
     searchQuery, 
     searchContent,
     activeChat,
-    setActiveChat
+    setActiveChat,
+    chats,
+    users,
+    currentUser
   } = useAppContext();
 
   const getTitle = () => {
     switch(page) {
       case 'feed': return 'BulbaGramm';
       case 'profile': return 'Профиль';
-      case 'direct': return activeChat ? 'Сообщения' : 'Директ';
+      case 'direct': 
+        if (activeChat) {
+          const chat = chats.find(c => c.id === activeChat);
+          if (chat) {
+            const otherUserId = chat.participants.find(id => id !== currentUser);
+            const otherUser = users[otherUserId];
+            return otherUser?.username || 'Сообщения';
+          }
+        }
+        return 'Директ';
       case 'search': return 'Поиск';
       case 'create': return 'Новый пост';
       default: return 'BulbaGramm';
@@ -25,11 +37,17 @@ export default function Header() {
   return (
     <div className="header">
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {(page === 'search' || (page === 'direct' && activeChat)) && (
+        {(page === 'search' || page === 'create' || page === 'profile' || (page === 'direct' && activeChat)) && (
           <button 
             className="nav-btn"
             onClick={() => {
               if (page === 'search') {
+                setPage('feed');
+                setSearchQuery('');
+                searchContent('');
+              } else if (page === 'create') {
+                setPage('feed');
+              } else if (page === 'profile') {
                 setPage('feed');
               } else if (activeChat) {
                 setActiveChat(null);
@@ -39,18 +57,21 @@ export default function Header() {
             <ArrowLeftIcon />
           </button>
         )}
-        <div className="logo">{getTitle()}</div>
-      </div>
-      
-      <div style={{ display: 'flex', gap: '16px' }}>
-        {page === 'search' ? (
+        
+        {page === 'direct' && !activeChat && (
           <button 
             className="nav-btn"
             onClick={() => setPage('feed')}
           >
-            Отмена
+            <ArrowLeftIcon />
           </button>
-        ) : (
+        )}
+        
+        <div className="logo">{getTitle()}</div>
+      </div>
+      
+      <div style={{ display: 'flex', gap: '16px' }}>
+        {page === 'feed' && (
           <>
             <button 
               className="nav-btn"
@@ -69,6 +90,19 @@ export default function Header() {
               <DirectIcon active={page === 'direct'} />
             </button>
           </>
+        )}
+        
+        {page === 'search' && (
+          <button 
+            className="nav-btn"
+            onClick={() => {
+              setPage('feed');
+              setSearchQuery('');
+              searchContent('');
+            }}
+          >
+            ✕
+          </button>
         )}
       </div>
     </div>
