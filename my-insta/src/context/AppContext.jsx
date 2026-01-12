@@ -211,6 +211,10 @@ export function AppProvider({ children }) {
     setPage('profile');
   };
 
+  const clearViewingUser = () => {
+    setViewingUserId(null);
+  };
+
   return (
     <AppContext.Provider value={{
       currentUser,
@@ -236,7 +240,7 @@ export function AppProvider({ children }) {
       startChat,
       editProfile,
       viewUserProfile,
-      setViewingUserId
+      clearViewingUser
     }}>
       {children}
     </AppContext.Provider>

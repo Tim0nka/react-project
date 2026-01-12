@@ -9,15 +9,24 @@ export default function Profile() {
     editProfile, 
     setPage,
     viewingUserId,
-    setViewingUserId
+    clearViewingUser
   } = useAppContext();
   
+  // Очищаем viewingUserId при монтировании, если это не просмотр чужого профиля
+  useEffect(() => {
+    if (!viewingUserId) {
+      clearViewingUser();
+    }
+  }, [viewingUserId, clearViewingUser]);
+
   // Если viewingUserId установлен, показываем профиль этого пользователя
   const userIdToShow = viewingUserId || currentUser;
   const user = users[userIdToShow] || { 
-    username: 'bulba', 
-    name: 'Bulba', 
-    bio: 'Создатель BulbaGramm',
+    username: userIdToShow === 'bulba' ? 'Bulba' : 
+             userIdToShow === 'user1' ? 'user1' : 
+             userIdToShow === 'user2' ? 'user2' : 'unknown',
+    name: 'Неизвестный пользователь',
+    bio: 'Биография отсутствует',
     followers: [],
     following: []
   };
@@ -32,15 +41,6 @@ export default function Profile() {
   
   const isOwnProfile = userIdToShow === currentUser;
 
-  useEffect(() => {
-    // Сбрасываем viewingUserId при уходе со страницы
-    return () => {
-      if (viewingUserId) {
-        setViewingUserId(null);
-      }
-    };
-  }, [viewingUserId, setViewingUserId]);
-
   const handleEditProfile = () => {
     if (editProfile(newUsername, newBio, null)) {
       setIsEditing(false);
@@ -49,22 +49,6 @@ export default function Profile() {
 
   return (
     <div style={{ padding: '16px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-        <button 
-          onClick={() => {
-            if (viewingUserId) {
-              setViewingUserId(null);
-            } else {
-              setPage('feed');
-            }
-          }}
-          style={{ background: 'none', border: 'none', color: '#0095f6', fontSize: '18px' }}
-        >
-          ←
-        </button>
-        <h2 style={{ color: '#0095f6', marginLeft: '12px' }}>Профиль</h2>
-      </div>
-      
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
         <div style={{ 
           width: '120px', 

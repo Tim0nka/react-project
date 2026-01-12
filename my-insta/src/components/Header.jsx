@@ -11,13 +11,16 @@ export default function Header() {
     setActiveChat,
     chats,
     users,
-    currentUser
+    currentUser,
+    viewingUserId,
+    clearViewingUser
   } = useAppContext();
 
   const getTitle = () => {
     switch(page) {
       case 'feed': return 'BulbaGramm';
-      case 'profile': return 'Профиль';
+      case 'profile': 
+        return viewingUserId ? (users[viewingUserId]?.username || 'Профиль') : 'Профиль';
       case 'direct': 
         if (activeChat) {
           const chat = chats.find(c => c.id === activeChat);
@@ -48,7 +51,11 @@ export default function Header() {
               } else if (page === 'create') {
                 setPage('feed');
               } else if (page === 'profile') {
-                setPage('feed');
+                if (viewingUserId) {
+                  clearViewingUser();
+                } else {
+                  setPage('feed');
+                }
               } else if (activeChat) {
                 setActiveChat(null);
               }

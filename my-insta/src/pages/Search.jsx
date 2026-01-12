@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 
 export default function Search() {
-  const { searchQuery, searchContent, searchResults, viewUserProfile, setPage } = useAppContext();
+  const { searchQuery, searchContent, searchResults, viewUserProfile, setPage, clearViewingUser } = useAppContext();
   const [error, setError] = useState('');
   
   useEffect(() => {
@@ -18,8 +18,15 @@ export default function Search() {
     }
   }, [searchQuery, searchResults]);
 
+  const handleUserClick = (userId) => {
+    clearViewingUser(); // Очищаем предыдущее состояние
+    setTimeout(() => {
+      viewUserProfile(userId);
+    }, 50);
+  };
+
   return (
-    <div style={{ padding: '16px' }}>
+    <div style={{ padding: '16px', paddingTop: '60px' }}>
       <input
         type="text"
         placeholder="Поиск пользователей..."
@@ -34,8 +41,7 @@ export default function Search() {
           background: '#121212', 
           color: 'white', 
           fontSize: '16px',
-          marginBottom: '20px',
-          marginTop: '10px'
+          marginBottom: '20px'
         }}
       />
       
@@ -54,9 +60,7 @@ export default function Search() {
       {searchResults.map(user => (
         <div 
           key={user.id} 
-          onClick={() => {
-            viewUserProfile(user.id);
-          }}
+          onClick={() => handleUserClick(user.id)}
           style={{ 
             padding: '16px', 
             borderBottom: '1px solid #333', 
@@ -97,7 +101,7 @@ export default function Search() {
           <h3 style={{ color: '#0095f6', marginBottom: '12px' }}>Популярные пользователи</h3>
           
           <div 
-            onClick={() => viewUserProfile('user1')}
+            onClick={() => handleUserClick('user1')}
             style={{ 
               padding: '16px', 
               backgroundColor: '#1e1e1e', 
@@ -111,7 +115,7 @@ export default function Search() {
           </div>
           
           <div 
-            onClick={() => viewUserProfile('user2')}
+            onClick={() => handleUserClick('user2')}
             style={{ 
               padding: '16px', 
               backgroundColor: '#1e1e1e', 
